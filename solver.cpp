@@ -7,17 +7,9 @@ enum Orientation {
 };
 
 // The possible sides a piece can have
-enum Side {
-    BOOBS_IN, BOOBS_OUT, RECT_IN, RECT_OUT, TRIANGLE_IN, TRIANGLE_OUT, TRAPEZIUM_IN, TRAPEZIUM_OUT,
+enum Side : int_fast8_t{
+    BOOBS_IN = -1, BOOBS_OUT = 1, RECT_IN = -2, RECT_OUT = 2, TRIANGLE_IN = -3, TRIANGLE_OUT = 3, TRAPEZIUM_IN = -4, TRAPEZIUM_OUT = 4,
 };
-
-// Returns true if the given sides fit, otherwise false
-bool sidesFit(Side one, Side two) {
-    return ((one == BOOBS_IN && two == BOOBS_OUT) || (one == BOOBS_OUT && two == BOOBS_IN) || 
-       (one == RECT_IN && two == RECT_OUT) || (one == RECT_OUT && two == RECT_IN) || 
-       (one == TRIANGLE_IN && two == TRIANGLE_OUT) || (one == TRIANGLE_OUT && two == TRIANGLE_IN) ||
-       (one == TRAPEZIUM_IN && two == TRAPEZIUM_OUT) || (one == TRAPEZIUM_OUT && two == TRAPEZIUM_IN));
-}
 
 class Piece {
  public:
@@ -63,7 +55,7 @@ bool checkPuzzle() {
                 Piece* leftNeighbor = puzzle[puzzleIdx - 1];
                 Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(3, puzzle[puzzleIdx]->orientation)];
                 Side otherSide = leftNeighbor->sides[convSideAndOrient(1, leftNeighbor->orientation)];
-                if(!sidesFit(mySide, otherSide)) { 
+                if(mySide + otherSide != 0) {
                     return false;
                 }
             }
@@ -72,7 +64,7 @@ bool checkPuzzle() {
                 Piece* upperNeighbor = puzzle[puzzleIdx - 3];
                 Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(0, puzzle[puzzleIdx]->orientation)];
                 Side otherSide = upperNeighbor->sides[convSideAndOrient(2, upperNeighbor->orientation)];
-                if(!sidesFit(mySide, otherSide)) { 
+                if(mySide + otherSide != 0) {
                     return false;
                 }
             }

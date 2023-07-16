@@ -80,7 +80,7 @@ void solve(uint_fast8_t startPuzzleIdx = 0) {
         }
         puzzle[startPuzzleIdx] = &pieces[pieceCnt];
         pieces[pieceCnt].isUsed = true;
-        for(uint_fast8_t sideCnt = 0;sideCnt < 4; ++sideCnt) { // try every orientation
+        for(uint_fast8_t sideCnt = 0; sideCnt < 4; ++sideCnt) { // try every orientation
             pieces[pieceCnt].orientation = (Orientation)sideCnt;
             if(checkPuzzle()) {
                 // puzzle is valid
@@ -91,6 +91,9 @@ void solve(uint_fast8_t startPuzzleIdx = 0) {
                     // not yet all parts used so do a recursive call for next position in the puzzle
                     solve(startPuzzleIdx + 1);
                 }
+            }
+            if(startPuzzleIdx == 4) {
+                break; // don't rotate middle piece (otherwise results in four puzzle solutions, same solution but rotated three time by 90 degrees)
             }
         }
         pieces[pieceCnt].isUsed = false;

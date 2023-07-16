@@ -47,27 +47,23 @@ void printPuzzle() {
 }
 
 // Returns true if the puzzle is still valid, otherwise false
-bool checkPuzzle() {
-    for(uint_fast8_t puzzleIdx = 1; puzzleIdx < 9; ++puzzleIdx) {
-        if(puzzle[puzzleIdx] != nullptr) {
-            if(puzzleIdx == 1 || puzzleIdx == 2 || puzzleIdx == 4 || puzzleIdx == 5 || puzzleIdx == 7 || puzzleIdx == 8) {
-                // check if this piece and the neighbouring piece on the left fit together
-                Piece* leftNeighbor = puzzle[puzzleIdx - 1];
-                Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(3, puzzle[puzzleIdx]->orientation)];
-                Side otherSide = leftNeighbor->sides[convSideAndOrient(1, leftNeighbor->orientation)];
-                if(mySide + otherSide != 0) {
-                    return false;
-                }
-            }
-            if(puzzleIdx > 2) {
-                // check if this piece and the upper neighbouring piece fit together
-                Piece* upperNeighbor = puzzle[puzzleIdx - 3];
-                Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(0, puzzle[puzzleIdx]->orientation)];
-                Side otherSide = upperNeighbor->sides[convSideAndOrient(2, upperNeighbor->orientation)];
-                if(mySide + otherSide != 0) {
-                    return false;
-                }
-            }
+bool checkPuzzle(uint_fast8_t puzzleIdx) {
+    if(puzzleIdx == 1 || puzzleIdx == 2 || puzzleIdx == 4 || puzzleIdx == 5 || puzzleIdx == 7 || puzzleIdx == 8) {
+        // check if this piece and the neighbouring piece on the left fit together
+        Piece* leftNeighbor = puzzle[puzzleIdx - 1];
+        Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(3, puzzle[puzzleIdx]->orientation)];
+        Side otherSide = leftNeighbor->sides[convSideAndOrient(1, leftNeighbor->orientation)];
+        if(mySide + otherSide != 0) {
+            return false;
+        }
+    }
+    if(puzzleIdx > 2) {
+        // check if this piece and the upper neighbouring piece fit together
+        Piece* upperNeighbor = puzzle[puzzleIdx - 3];
+        Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(0, puzzle[puzzleIdx]->orientation)];
+        Side otherSide = upperNeighbor->sides[convSideAndOrient(2, upperNeighbor->orientation)];
+        if(mySide + otherSide != 0) {
+            return false;
         }
     }
     return true;
@@ -82,7 +78,7 @@ void solve(uint_fast8_t startPuzzleIdx = 0) {
         pieces[pieceCnt].isUsed = true;
         for(uint_fast8_t sideCnt = 0; sideCnt < 4; ++sideCnt) { // try every orientation
             pieces[pieceCnt].orientation = (Orientation)sideCnt;
-            if(checkPuzzle()) {
+            if(checkPuzzle(startPuzzleIdx)) {
                 // puzzle is valid
                 if(startPuzzleIdx == 8) {
                     // all 9 parts used 

@@ -11,8 +11,7 @@ enum Side : int_fast8_t{
     BOOBS_IN = -1, BOOBS_OUT = 1, RECT_IN = -2, RECT_OUT = 2, TRIANGLE_IN = -3, TRIANGLE_OUT = 3, TRAPEZIUM_IN = -4, TRAPEZIUM_OUT = 4,
 };
 
-class Piece {
- public:
+struct Piece {
     uint_fast8_t pieceNum; // needed for later matching the program output to real puzzle pieces
     bool isUsed;
     const Side sides[4];
@@ -40,29 +39,28 @@ unsigned int convSideAndOrient(int sideIdx, Orientation orientation) {
 
 // Prints the found puzzle solution
 void printPuzzle() {
-    for(uint_fast8_t puzzleIdx = 0; puzzleIdx < 9; ++puzzleIdx) {
+    for (uint_fast8_t puzzleIdx = 0; puzzleIdx < 9; ++puzzleIdx) {
         std::cout << "Part " << (int)puzzle[puzzleIdx]->pieceNum << " at position " << (int)puzzleIdx+1 << " with orientation " << (int) puzzle[puzzleIdx]->orientation << std::endl;
     }
-    std::cout << std::endl;
 }
 
 // Returns true if the puzzle is still valid, otherwise false
 bool checkPuzzle(uint_fast8_t puzzleIdx) {
-    if(puzzleIdx == 1 || puzzleIdx == 2 || puzzleIdx == 4 || puzzleIdx == 5 || puzzleIdx == 7 || puzzleIdx == 8) {
+    if (puzzleIdx == 1 || puzzleIdx == 2 || puzzleIdx == 4 || puzzleIdx == 5 || puzzleIdx == 7 || puzzleIdx == 8) {
         // check if this piece and the neighbouring piece on the left fit together
         Piece* leftNeighbor = puzzle[puzzleIdx - 1];
-        Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(3, puzzle[puzzleIdx]->orientation)];
-        Side otherSide = leftNeighbor->sides[convSideAndOrient(1, leftNeighbor->orientation)];
-        if(mySide + otherSide != 0) {
+        const Side& mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(3, puzzle[puzzleIdx]->orientation)];
+        const Side& otherSide = leftNeighbor->sides[convSideAndOrient(1, leftNeighbor->orientation)];
+        if (mySide + otherSide != 0) {
             return false;
         }
     }
-    if(puzzleIdx > 2) {
+    if (puzzleIdx > 2) {
         // check if this piece and the upper neighbouring piece fit together
         Piece* upperNeighbor = puzzle[puzzleIdx - 3];
-        Side mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(0, puzzle[puzzleIdx]->orientation)];
-        Side otherSide = upperNeighbor->sides[convSideAndOrient(2, upperNeighbor->orientation)];
-        if(mySide + otherSide != 0) {
+        const Side& mySide = puzzle[puzzleIdx]->sides[convSideAndOrient(0, puzzle[puzzleIdx]->orientation)];
+        const Side& otherSide = upperNeighbor->sides[convSideAndOrient(2, upperNeighbor->orientation)];
+        if (mySide + otherSide != 0) {
             return false;
         }
     }
@@ -70,30 +68,29 @@ bool checkPuzzle(uint_fast8_t puzzleIdx) {
 }
 
 void solve(uint_fast8_t startPuzzleIdx = 0) {
-    for(uint_fast8_t pieceCnt = 0; pieceCnt < 9; ++pieceCnt) { // try every piece ...
-        if(pieces[pieceCnt].isUsed) {
-            continue; // ... that has not yet been used 
-        }
-        puzzle[startPuzzleIdx] = &pieces[pieceCnt];
-        pieces[pieceCnt].isUsed = true;
-        for(uint_fast8_t sideCnt = 0; sideCnt < 4; ++sideCnt) { // try every orientation
-            pieces[pieceCnt].orientation = (Orientation)sideCnt;
-            if(checkPuzzle(startPuzzleIdx)) {
-                // puzzle is valid
-                if(startPuzzleIdx == 8) {
-                    // all 9 parts used 
-                    printPuzzle();
-                } else {
-                    // not yet all parts used so do a recursive call for next position in the puzzle
-                    solve(startPuzzleIdx + 1);
+    for (uint_fast8_t pieceCnt = 0; pieceCnt < 9; ++pieceCnt) { // try every piece ...
+        if (!pieces[pieceCnt].isUsed) { // ... that has not yet been used 
+            puzzle[startPuzzleIdx] = &pieces[pieceCnt];
+            pieces[pieceCnt].isUsed = true;
+            for (uint_fast8_t sideCnt = 0; sideCnt < 4; ++sideCnt) { // try every orientation
+                pieces[pieceCnt].orientation = (Orientation)sideCnt;
+                if (checkPuzzle(startPuzzleIdx)) {
+                    // puzzle is valid
+                    if (startPuzzleIdx == 8) {
+                        // all 9 parts used 
+                        printPuzzle();
+                    } else {
+                        // not yet all parts used so do a recursive call for next position in the puzzle
+                        solve(startPuzzleIdx + 1);
+                    }
+                }
+                if (startPuzzleIdx == 4) {
+                    break; // don't rotate middle piece (otherwise results in four puzzle solutions, same solution but rotated three time by 90 degrees)
                 }
             }
-            if(startPuzzleIdx == 4) {
-                break; // don't rotate middle piece (otherwise results in four puzzle solutions, same solution but rotated three time by 90 degrees)
-            }
+            pieces[pieceCnt].isUsed = false;
+            puzzle[startPuzzleIdx] = nullptr;
         }
-        pieces[pieceCnt].isUsed = false;
-        puzzle[startPuzzleIdx] = nullptr;
     }
 } 
 
